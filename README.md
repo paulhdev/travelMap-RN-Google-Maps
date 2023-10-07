@@ -16,7 +16,7 @@
 </h4>
 
 <p align="center">
-  <a href="#technologies">Technologies</a> | <a href="#license">License</a> |
+  <a href="#technologies">Technologies</a> | <a href="#license">License</a>
 </p>
 
 <img src="https://i.imgur.com/UL2qVXP.png">
