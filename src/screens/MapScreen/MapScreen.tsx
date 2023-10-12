@@ -1,4 +1,5 @@
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
@@ -14,17 +15,58 @@ import {
   Container,
   DetailsArea,
   MapArea,
-  PlacesColumn,
-  PlacesLine,
-  Subtitle,
-  Title,
+  RideArea,
+  RideInfo,
+  RideName,
+  RidePrice,
+  TitleRide,
 } from './MapScreenStyles';
-import { useFocusEffect } from '@react-navigation/native';
+
+type TravelInfoProps = {
+  distance: {
+    text: string;
+    value: number;
+  };
+  duration: {
+    text: string;
+    value: number;
+  };
+  status: string;
+};
+
+type CarProps = {
+  id: string;
+  title: string;
+  multiplier: number;
+};
 
 type ScreenProps = NativeStackScreenProps<AppStackParamList, 'MapScreen'>;
 
+const SURGE_CHARGE_RATE = 1.5;
+
+const CAR_OPTIONS = [
+  {
+    id: 'car-x',
+    title: 'CarX',
+    multiplier: 1,
+  },
+  {
+    id: 'car-xl',
+    title: 'Car XL',
+    multiplier: 1.2,
+  },
+  {
+    id: 'car-lux',
+    title: 'Car LUX',
+    multiplier: 1.3,
+  },
+] as CarProps[];
+
 export function MapScreen({ navigation, route }: ScreenProps) {
   const { origin, destination } = route.params;
+
+  const [travelInformation, setTravelInformation] =
+    useState<TravelInfoProps | null>(null);
 
   const mapRef = useRef<MapView | null>(null);
 
@@ -33,7 +75,7 @@ export function MapScreen({ navigation, route }: ScreenProps) {
 
     const fitToMarkers = () => {
       mapRef.current?.fitToSuppliedMarkers(['origin', 'destination'], {
-        edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
+        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
       });
     };
 
@@ -42,6 +84,25 @@ export function MapScreen({ navigation, route }: ScreenProps) {
     // @ts-ignore
     return () => clearTimeout(fitToMarkers);
   }, [origin, destination, mapRef]);
+
+  useEffect(() => {
+    if (!origin || !destination) return;
+
+    const getTravelTime = async () => {
+      fetch(
+        `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${origin.info.name}&destinations=${destination.info.name}&key=${GOOGLE_MAPS_API_KEY}`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          const infos = data.rows[0].elements[0];
+          if (infos.status === 'OK') {
+            setTravelInformation(infos);
+          }
+        });
+    };
+
+    getTravelTime();
+  }, [origin, destination, GOOGLE_MAPS_API_KEY]);
 
   return (
     <Container>
@@ -99,16 +160,34 @@ export function MapScreen({ navigation, route }: ScreenProps) {
         </MapView>
       </MapArea>
       <DetailsArea>
-        <PlacesLine>
-          <PlacesColumn>
-            <Title>From</Title>
-            <Subtitle numberOfLines={2}>{origin?.title}</Subtitle>
-          </PlacesColumn>
-          <PlacesColumn>
-            <Title>To</Title>
-            <Subtitle numberOfLines={2}>{destination?.title}</Subtitle>
-          </PlacesColumn>
-        </PlacesLine>
+        {travelInformation !== null && (
+          <>
+            <TitleRide>
+              Ride Options - {travelInformation.distance.text}
+            </TitleRide>
+            {CAR_OPTIONS.map((car) => (
+              <RideArea key={car.id}>
+                <View>
+                  <RideName>{car.title}</RideName>
+                  <RideInfo>
+                    {travelInformation.duration.text} - Travel Time
+                  </RideInfo>
+                </View>
+                <RidePrice>
+                  {new Intl.NumberFormat('en-us', {
+                    style: 'currency',
+                    currency: 'USD',
+                  }).format(
+                    (travelInformation.duration.value *
+                      SURGE_CHARGE_RATE *
+                      car.multiplier) /
+                      100
+                  )}
+                </RidePrice>
+              </RideArea>
+            ))}
+          </>
+        )}
         <Button onPress={() => navigation.goBack()}>
           <ButtonText>Go to Main Screen</ButtonText>
         </Button>

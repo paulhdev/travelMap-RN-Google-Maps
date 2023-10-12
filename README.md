@@ -20,7 +20,7 @@
 </p>
 
 <img src="https://i.imgur.com/UL2qVXP.png">
-<img src="https://i.imgur.com/7heDCvU.png">
+<img src="https://i.imgur.com/Oc3hAzx.png">
 
 ## Technologies
 

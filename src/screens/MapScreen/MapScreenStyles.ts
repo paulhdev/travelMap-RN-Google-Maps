@@ -7,36 +7,48 @@ export const Container = styled.View`
 
 export const MapArea = styled.View`
   width: 100%;
-  height: 80%;
+  height: 55%;
 `;
 
 export const DetailsArea = styled.View`
   width: 100%;
-  height: 20%;
+  height: 45%;
   padding: 5%;
 `;
 
-export const PlacesLine = styled.View`
+export const TitleRide = styled.Text`
+  font-size: 16px;
+  font-family: 'Poppins_500Medium';
+  color: #020202;
+`;
+
+export const RideArea = styled.View`
+  width: 100%;
+  border-bottom-width: 1px;
+  border-color: #eee;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  padding: 10px 0;
 `;
 
-export const PlacesColumn = styled.View`
-  width: 45%;
-`;
-
-export const Title = styled.Text`
-  font-size: 12px;
+export const RideName = styled.Text`
+  font-size: 14px;
   font-family: 'Poppins_700Bold';
   color: #020202;
   margin-bottom: -5px;
 `;
 
-export const Subtitle = styled.Text`
-  font-size: 14px;
+export const RideInfo = styled.Text`
+  font-size: 12px;
   font-family: 'Poppins_400Regular';
-  color: #999;
+  color: #020202;
+`;
+
+export const RidePrice = styled.Text`
+  font-size: 20px;
+  font-family: 'Poppins_500Medium';
+  color: #020202;
 `;
 
 export const Button = styled.TouchableOpacity`
